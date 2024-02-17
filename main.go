@@ -12,7 +12,7 @@ func main() {
 
 	r.HandleFunc("/", redirectToFarcaster)
 	r.HandleFunc("/{name}", redirectToFarcasterName)
-	r.HandleFunc("/c/surreal", redirectToFarcasterSurreal)
+	r.HandleFunc("/c/{channel}", redirectToFarcasterSurreal)
 
 	err := http.ListenAndServe(":8080", r)
 	if err != nil {
@@ -30,5 +30,7 @@ func redirectToFarcasterName(w http.ResponseWriter, r *http.Request) {
 }
 
 func redirectToFarcasterSurreal(w http.ResponseWriter, r *http.Request) {
-	http.Redirect(w, r, "https://warpcast.com/~/channel/surreal", http.StatusSeeOther)
+	vars := mux.Vars(r)
+	channel := vars["channel"]
+	http.Redirect(w, r, "https://warpcast.com/~/channel/"+channel, http.StatusSeeOther)
 }
