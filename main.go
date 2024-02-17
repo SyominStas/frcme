@@ -7,7 +7,7 @@ import (
 )
 
 var (
-	addr = flag.String("addr", "localhost:8080", "address to serve")
+	addr = flag.String("addr", ":8080", "address to serve")
 )
 
 func main() {
@@ -15,8 +15,10 @@ func main() {
 	http.HandleFunc("/artiom", redirectToFarcasterArtyom)
 	http.HandleFunc("/c/surreal", redirectToFarcasterSurreal)
 
-	log.Printf("serving http://%s\n", *addr)
-	log.Fatal(http.ListenAndServe(*addr, nil))
+	err := http.ListenAndServe(*addr, nil)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
 }
 
 func redirectToFarcasterArtyom(w http.ResponseWriter, r *http.Request) {
