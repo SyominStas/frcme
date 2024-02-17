@@ -1,30 +1,34 @@
 package main
 
 import (
-	"flag"
 	"log"
 	"net/http"
-)
 
-var (
-	addr = flag.String("addr", ":8080", "address to serve")
+	"github.com/gorilla/mux"
 )
 
 func main() {
-	http.HandleFunc("/", redirectToFarcasterArtyom)
-	http.HandleFunc("/artiom", redirectToFarcasterArtyom)
-	http.HandleFunc("/c/surreal", redirectToFarcasterSurreal)
+	r := mux.NewRouter()
 
-	err := http.ListenAndServe(*addr, nil)
+	r.HandleFunc("/", redirectToFarcaster)
+	r.HandleFunc("/{name}", redirectToFarcasterName)
+	r.HandleFunc("/c/surreal", redirectToFarcasterSurreal)
+
+	err := http.ListenAndServe(":8080", r)
 	if err != nil {
 		log.Fatal(err.Error())
 	}
 }
+func redirectToFarcaster(w http.ResponseWriter, r *http.Request) {
+	http.Redirect(w, r, " https://warpcast.com", http.StatusSeeOther)
+}
 
-func redirectToFarcasterArtyom(w http.ResponseWriter, r *http.Request) {
-	http.Redirect(w, r, "https://warpcast.com/artiom", http.StatusPermanentRedirect)
+func redirectToFarcasterName(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	name := vars["name"]
+	http.Redirect(w, r, "https://warpcast.com/"+name, http.StatusSeeOther)
 }
 
 func redirectToFarcasterSurreal(w http.ResponseWriter, r *http.Request) {
-	http.Redirect(w, r, "https://warpcast.com/~/channel/surreal", http.StatusPermanentRedirect)
+	http.Redirect(w, r, "https://warpcast.com/~/channel/surreal", http.StatusSeeOther)
 }
